@@ -1,3 +1,10 @@
+/**
+ * Exercise 1.13 - Histogram Extension
+ * 
+ * Print a vertical histogram of words in the input.
+ * 
+ **/
+
 #include <stdio.h>
 
 #define MAXWORDS 30
@@ -11,8 +18,6 @@ main()
 
     for(i = 0; i < MAXWORDS; i++)
         words[i] = 0;
-
-    //Exercise 1.13 alternative
     while((c = getchar()) != EOF && word < MAXWORDS)
     {
         if(c == ' ' || c =='\n' || c == '\t')

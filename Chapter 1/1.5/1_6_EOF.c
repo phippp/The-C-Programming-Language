@@ -1,13 +1,17 @@
+/**
+ * Exercise 1.6 - EOF
+ * 
+ * verify that the expression getchar() != EOF is 0 or 1
+ *
+ **/
+
 #include <stdio.h>
 
 main()
 {
     int c;
-
-    //Exercise 1.6
     while((c = getchar()) != EOF){
-        putchar(c);
-        printf("%d", c != EOF);
+        printf("%c : %d\n", c, c != EOF);
     }
 
     printf("%d", c != EOF);

@@ -1,9 +1,15 @@
+/**
+ * Exercise 1.13 - Histogram
+ * 
+ * Print a horizontal histogram of words in the input.
+ * 
+ **/
+
 #include <stdio.h>
 
 main()
 {
     int c;
-    //Exercise 1.13
     while((c = getchar()) != EOF)
     {
         if(c == ' ' || c =='\n' || c == '\t')

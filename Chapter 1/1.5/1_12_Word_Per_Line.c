@@ -1,17 +1,24 @@
+/**
+ * Exercise 1.12 - Word Per Line
+ * 
+ * Write a program that prints its input one word per line.
+ *
+ **/
+
 #include <stdio.h>
-#define IN 1 /* inside a word */
-#define OUT 0 /* outside a word */
+
+#define IN 1 
+#define OUT 0 
 
 main()
 {
     int c, state;
     state = OUT;
 
-    //Exercise 1.12
     while((c = getchar()) != EOF) {
         if(c ==' ' || c == '\t')
         {
-            state=OUT;
+            state = OUT;
         }
         else if (state == OUT) 
         {

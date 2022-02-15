@@ -1,10 +1,15 @@
+/**
+ * Exercise 1.8 - Whitespace
+ * 
+ * write a program to count blanks, tabs and newlines
+ *
+ **/
+
 #include <stdio.h>
 
 main()
 {
-    int ws, c;
-    ws = 0;
-    //Exercise 1.8
+    int c, ws = 0;
     while((c = getchar()) != EOF){
         if(c == '\t' || c == ' ' || c == '\n')
             ws++;

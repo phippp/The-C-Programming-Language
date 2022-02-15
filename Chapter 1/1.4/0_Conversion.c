@@ -1,3 +1,12 @@
+/**
+ *
+ * Not an Exercise
+ *
+ * print Fahrenheit-Celsius table for celsius = 300, 280, ..., 0; 
+ * using a for loop and symbolic constants.
+ *
+ **/
+
 #include <stdio.h>
 
 #define LOWER 0

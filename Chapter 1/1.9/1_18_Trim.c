@@ -1,3 +1,11 @@
+/**
+ * Exercise 1.18 - Trim
+ *
+ * Write a program to remove trailing blanks and tabs from
+ * each line of input and delete entirely blank rows.
+ * 
+ **/
+
 #include <stdio.h>
 
 int getline(char line[], int limit);
@@ -5,8 +13,6 @@ int trim(char s[], int length);
 void copy(char to[], char from[]);
 
 #define MAXLENGTH 1000
-
-//Exercise 1.18
 
 main()
 {

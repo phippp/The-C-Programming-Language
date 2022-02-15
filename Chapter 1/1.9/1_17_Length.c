@@ -1,11 +1,17 @@
+/**
+ * Exercise 1.17 - Length
+ *
+ * Program to print the length of all input lines greater
+ * than 80 characters.
+ * 
+ **/
+
 #include <stdio.h>
 
 int getline(char line[], int limit);
 void copy(char to[], char from[]);
 
 #define MAXLENGTH 1000
-
-//Exercise 1.17
 
 main()
 {

@@ -1,11 +1,17 @@
+/**
+ * Exercise 1.14 - Character Counter
+ * 
+ * Print a histogram of the frequencies of different
+ * characters in an input.
+ * 
+ **/
+
 #include <stdio.h>
 
 #define CHARS 128
 
 main()
 {
-    //Exercise 1.14
-
     int c, i, j;
     int counter[CHARS];
 
