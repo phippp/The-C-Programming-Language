@@ -12,7 +12,6 @@
 main()
 {
     int c;
-    //Exercise 1.9
     while((c = getchar()) != EOF){
         if(c == '\t'){
             putchar('\\');
