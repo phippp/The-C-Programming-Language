@@ -9,9 +9,12 @@
 
 /**
  * Currently doesnt seem to parse * as a argument via command line:
- * It gets replaced by two arguments:
- *      1) ../../5_10_Reverse_Polish.c
- *      2) <compiled_filename>.exe
+ * It gets replaced by any files in that directory.
+ * This appears to be a problem with the shell rather than code see.
+ * https://stackoverflow.com/questions/63311501/asterisk-in-c-console-lists-all-files-in-folder-why
+ * With my current shell escaping doesnt work. However, after testing on macOS 
+ * with bash I was able to escape it as \* or '*' and both worked fine.
+ * As a replacement I have also added 'x' as a way to multiply for convenience.
  */
 
 #include <stdio.h>
@@ -53,6 +56,7 @@ main(int argc, char *args[])
                 push(pop() + pop());
                 break;
             case '*':
+            case 'x':
                 push(pop() * pop());
                 break;
             case '-':
