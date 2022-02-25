@@ -1,19 +1,11 @@
 /**
  *
- * Exercise 5.11 - Detab
+ * Exercise 5.12 - Entab
  *
- * Modify the program detab (written as exercises in Chapter 1) to accept 
- * a list of tab stops as arguments. Use the default tab settings if there are no arguments.
- *
+ * Extend entab to accept the shorthand entab -m +n to mean tab stops every 
+ * n columns; starting at column m. Choose convenient size for the default behaviour
+ * 
  **/
-
-/**
- * Accepts:
- *      no args         -> offset = 0, spacing = 8 (every 8 space starting from 0)
- *      1 arg (n)       -> offset = 0, spacing = n (every n spaces starting from 0)
- *      2 args (m, n)   -> offset = n, spacing = m (every n spaces starting from m)
- *      n args          -> each arg is an index for tab spaces
- */
 
 #include <stdio.h>
 #include <string.h>
@@ -25,14 +17,14 @@
 
 void parseArgs(int, char *[], int *);
 int atoi(char *);
-void detab(int *);
+void entab(int *);
 
 main(int argc, char *args[])
 {
     int n;
     int tabs[MAXLINE];
     parseArgs(argc, args, tabs);
-    detab(tabs);
+    entab(tabs);
 }
 
 void parseArgs(int c, char *args[], int *tabs){
@@ -41,10 +33,10 @@ void parseArgs(int c, char *args[], int *tabs){
     // intialise as empty array
     for(i = 0; i < MAXLINE; i++)
         *(tabs + i) = 0;
-    if(c <= 2){
+    if(c == 2 && **(args + 1) == '-' && **(args + 2) == '+'){
         // upto 2 arguments passed
-        num = c > 0 ? atoi(*++args) : STANDARD_TAB;
-        start = c > 1 ? atoi(*++args) : 0;
+        start = atoi(&(*++args)[1]);
+        num = atoi(&(*++args)[1]);
         printf("Start index: %d\nEvery: %d\n", start, num);
         for(i = start; i < MAXLINE; i += num)
             *(tabs + i) = YES;
@@ -58,21 +50,35 @@ void parseArgs(int c, char *args[], int *tabs){
     }
 }
 
-void detab(int *tabs){
-    int c, pos = 0;
-    while((c = getchar()) != EOF){
-        if(pos >= MAXLINE || c == '\n'){
-            putchar('\n');
-            pos = 0;
-        } else if(c == '\t'){
-            do
-                putchar(' ');
-            while(*(tabs + ++pos) != YES && pos < MAXLINE);
-        }else{
+void entab(int *tab){
+    int c,pos;
+    int nb, nt; 
+    nb = nt = 0;
+
+    for(pos = 0; (c = getchar()) != EOF; pos++)
+        if(c == ' '){
+            if(!*(tab + pos)){
+                ++nb;
+            } else {
+                nb = 0;
+                ++nt;
+            }
+        } else {
+            for(; nt ; nt--)
+                putchar('\t');
+            if(c == '\t')
+                nb = 0;
+            else
+                for(; nb > 0;nb--)
+                    putchar(' ');
             putchar(c);
-            ++pos;
+            
+            if(c == '\n')
+                pos = 0;
+            else if(c == '\t')
+                while(!*(tab + pos))
+                    ++pos;
         }
-    }
 }
 
 int atoi(char *line){
