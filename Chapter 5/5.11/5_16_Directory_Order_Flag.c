@@ -1,9 +1,9 @@
 /**
  *
- * Exercise 5.15 - Insensitive Flag
+ * Exercise 5.16 - Directory Order Flag
  *
- * Add the option -f to fold upper and lower case together, so that 
- * case distinctions are not made during sorting; for example, a and A compare equal.
+ * Add the -d (directory order) option, which makes comparisons only 
+ * on letters, numbers and blanks. Make sure it works in conjunction with -f.
  *
  **/
 
@@ -20,14 +20,16 @@
 #define NUMERIC 1
 #define REVERSE 2
 #define INSENSITIVE 4
+#define DIRECTORY 8
 #define MAXLINES 100
 #define MAXLENGTH 1000
 #define ALLOCSIZE 1000
 
 static char allocbuf[ALLOCSIZE];
 static char *allocp = allocbuf;
+static int option = 0;
 
-void arguments(int, char *[], int *);
+void arguments(int, char *[]);
 int mgetline(char *, int);
 int numcmp(char *, char *);
 int charcmp(char *, char *);
@@ -41,12 +43,9 @@ main(int argc, char *args[])
 {
     int nlines;
     int (*compare)(void *, void *);
-    int option = 0;
     char *lineptr[MAXLINES];
-    arguments(argc, args, &option);
-    compare = (option & NUMERIC) 
-                ? numcmp 
-                : (option & INSENSITIVE) ? charcmp : strcmp;
+    arguments(argc, args);
+    compare = (option & NUMERIC) ? numcmp : charcmp;
     if((nlines = readlines(lineptr, MAXLINES)) > 0){
         myqsort((void **)lineptr, 0, nlines -1, compare);
         writelines(lineptr, nlines, option & REVERSE);
@@ -55,19 +54,22 @@ main(int argc, char *args[])
     }
 }
 
-void arguments(int c, char *args[], int *options){
+void arguments(int c, char *args[]){
     char *input;
     while(--c && *(input = *++args) == '-'){
         while(*++input){
             switch (*input){
+                case 'd':
+                    option |= DIRECTORY;
+                    break;
                 case 'r':
-                    *options |= REVERSE;
+                    option |= REVERSE;
                     break;
                 case 'n':
-                    *options |= NUMERIC;
+                    option |= NUMERIC;
                     break;
                 case 'f':
-                    *options |= INSENSITIVE;
+                    option |= INSENSITIVE;
                     break;          
                 default:
                     printf("Invalid flag -%c\n", *input);
@@ -85,10 +87,21 @@ int numcmp(char *s1, char *s2){
 }
 
 int charcmp(char *s1, char *s2){
-    for(;tolower(*s1) == tolower(*s2); s1++, s2++)
-        if(*s1 == '\0')
+    int comp;
+    int i = (option & INSENSITIVE);
+    int d = (option & DIRECTORY);
+    do{
+        if(d){
+            while(!isalnum(*s1) && *s1 != ' ' && *s1 != '\0')
+                s1++;
+            while(!isalnum(*s2) && *s2 != ' ' && *s2 != '\0')
+                s2++;
+        }
+        comp = (i) ? tolower(*s1) == tolower(*s2) : *s1 == *s2;
+        if(comp && *s1 == '\0')
             return 0;
-    return tolower(*s1) - tolower(*s2);
+    }while(*s1++ == *s2++);
+    return *--s1 - *--s2;
 }
 
 int readlines(char *lineptr[], int maxlines){

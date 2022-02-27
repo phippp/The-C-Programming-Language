@@ -1,9 +1,9 @@
 /**
  *
- * Exercise 5.15 - Insensitive Flag
+ * Exercise 5.17 - Field Handling
  *
- * Add the option -f to fold upper and lower case together, so that 
- * case distinctions are not made during sorting; for example, a and A compare equal.
+ * Add a field-searching capability, so sorting may bee done on fields 
+ * within lines, each field sorted according to an independent set of options.
  *
  **/
 
@@ -20,14 +20,19 @@
 #define NUMERIC 1
 #define REVERSE 2
 #define INSENSITIVE 4
+#define DIRECTORY 8
 #define MAXLINES 100
 #define MAXLENGTH 1000
 #define ALLOCSIZE 1000
 
 static char allocbuf[ALLOCSIZE];
 static char *allocp = allocbuf;
+static int option = 0;
+static int start = 0;
+static int end = 0;
 
-void arguments(int, char *[], int *);
+void arguments(int, char *[]);
+void substr(char *, char *, int, int);
 int mgetline(char *, int);
 int numcmp(char *, char *);
 int charcmp(char *, char *);
@@ -41,12 +46,9 @@ main(int argc, char *args[])
 {
     int nlines;
     int (*compare)(void *, void *);
-    int option = 0;
     char *lineptr[MAXLINES];
-    arguments(argc, args, &option);
-    compare = (option & NUMERIC) 
-                ? numcmp 
-                : (option & INSENSITIVE) ? charcmp : strcmp;
+    arguments(argc, args);
+    compare = (option & NUMERIC) ? numcmp : charcmp;
     if((nlines = readlines(lineptr, MAXLINES)) > 0){
         myqsort((void **)lineptr, 0, nlines -1, compare);
         writelines(lineptr, nlines, option & REVERSE);
@@ -55,40 +57,86 @@ main(int argc, char *args[])
     }
 }
 
-void arguments(int c, char *args[], int *options){
+void arguments(int c, char *args[]){
     char *input;
-    while(--c && *(input = *++args) == '-'){
-        while(*++input){
-            switch (*input){
-                case 'r':
-                    *options |= REVERSE;
-                    break;
-                case 'n':
-                    *options |= NUMERIC;
-                    break;
-                case 'f':
-                    *options |= INSENSITIVE;
-                    break;          
-                default:
-                    printf("Invalid flag -%c\n", *input);
-                    break;
+    while(--c && *(input = *++args) == '-' || *input == '+'){
+        if(*input == '-' && !isdigit(*(input + 1))){
+            while(*++input){
+                switch (*input){
+                    case 'd':
+                        option |= DIRECTORY;
+                        break;
+                    case 'r':
+                        option |= REVERSE;
+                        break;
+                    case 'n':
+                        option |= NUMERIC;
+                        break;
+                    case 'f':
+                        option |= INSENSITIVE;
+                        break;          
+                    default:
+                        printf("Invalid flag -%c\n", *input);
+                        break;
+                }
             }
+        } else if(*input == '-'){
+            end = atoi(input + 1);
+        } else {
+            start = atoi(input + 1);
         }
+    }
+    if(start > end){
+        printf("ERROR: Start bigger than end\n");
+        exit(1);
     }
 }
 
+void substr(char *in, char *out, int start, int end){
+    int i;
+    int length = strlen(in);
+    int e = end ? end : length;
+    if(start >= length || e > length){
+        printf("ERROR: String too short [%d, %d]\n", start, e);
+        exit(1);
+    }
+    for(i = 0; i < start; i++, in++)
+        ;
+    for(; i < e; i++)
+        *out++ = *in++;
+    *out = '\0';
+}
+
 int numcmp(char *s1, char *s2){
+    char str[MAXLENGTH];
     double v1, v2;
-    v1 = atof(s1);
-    v2 = atof(s2);
+    substr(s1, str, start, end);
+    v1 = atof(str);
+    substr(s2, str, start, end);
+    v2 = atof(str);
     return (int)(v1 - v2);
 }
 
 int charcmp(char *s1, char *s2){
-    for(;tolower(*s1) == tolower(*s2); s1++, s2++)
-        if(*s1 == '\0')
+    int comp;
+    char str1[MAXLENGTH], str2[MAXLENGTH];
+    char *p1 = str1, *p2 = str2;
+    int i = (option & INSENSITIVE);
+    int d = (option & DIRECTORY);
+    substr(s1, str1, start, end);
+    substr(s2, str2, start, end);
+    do{
+        if(d){
+            while(!isalnum(*p1) && *p1 != ' ' && *p1 != '\0')
+                p1++;
+            while(!isalnum(*p2) && *p2 != ' ' && *p2 != '\0')
+                p2++;
+        }
+        comp = (i) ? tolower(*p1) == tolower(*p2) : *p1 == *p2;
+        if(comp && *p1 == '\0')
             return 0;
-    return tolower(*s1) - tolower(*s2);
+    }while(*p1++ == *p2++);
+    return *--p1 - *--p2;
 }
 
 int readlines(char *lineptr[], int maxlines){
