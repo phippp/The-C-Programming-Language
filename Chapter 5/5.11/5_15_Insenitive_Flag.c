@@ -7,11 +7,6 @@
  *
  **/
 
-/**
- * Had to compile with -fpermissive otherwise it would encounter an error compiling:
- *      'int (*)(char*, char*)' and 'int (*)(const char*, const char*)' lacks a cast
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
